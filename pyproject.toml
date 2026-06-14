@@ -1,0 +1,26 @@
+[project]
+name = "jarvis-assistant"
+version = "0.1.0"
+description = "Locally hosted Jarvis-style assistant with small-model memory optimization."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [ { name = "Jarvis Local" } ]
+
+[project.dependencies]
+fastapi = "^0.110.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+transformers = "^4.40.0"
+torch = "^2.0.0"
+sentence-transformers = "^2.3.0"
+sqlmodel = "^0.0.8"
+numpy = "^1.26.0"
+python-multipart = "^0.0.6"
+pydantic-settings = "^2.0.0"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0"]
+
+[build-system]
+requires = ["setuptools>=65.5.0","wheel"]
+build-backend = "setuptools.build_meta"

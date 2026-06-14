@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jarvis Assistant</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #111; color: #eee; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .chat-window { border: 1px solid #333; border-radius: 10px; background: #141414; padding: 16px; min-height: 60vh; }
+    .message { margin-bottom: 14px; }
+    .message.user { text-align: right; }
+    .message .bubble { display: inline-block; padding: 12px; border-radius: 14px; max-width: 85%; }
+    .message.user .bubble { background: #1f6feb; }
+    .message.assistant .bubble { background: #222; }
+    textarea { width: 100%; height: 100px; border-radius: 10px; border: 1px solid #333; background: #111; color: #eee; padding: 12px; }
+    button { margin-top: 10px; padding: 12px 20px; border: none; border-radius: 10px; background: #1f6feb; color: #fff; cursor: pointer; }
+    button:disabled { opacity: 0.6; cursor: default; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Jarvis Assistant</h1>
+    <div class="chat-window" id="chatWindow"></div>
+    <textarea id="prompt" placeholder="Ask Jarvis something..."></textarea>
+    <button id="sendButton">Send</button>
+  </div>
+  <script>
+    const chatWindow = document.getElementById('chatWindow');
+    const prompt = document.getElementById('prompt');
+    const sendButton = document.getElementById('sendButton');
+
+    function addMessage(role, text) {
+      const message = document.createElement('div');
+      message.className = `message ${role}`;
+      message.innerHTML = `<div class="bubble"><strong>${role === 'user' ? 'You' : 'Jarvis'}:</strong> ${text}</div>`;
+      chatWindow.appendChild(message);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    async function sendMessage() {
+      const text = prompt.value.trim();
+      if (!text) return;
+      addMessage('user', text);
+      prompt.value = '';
+      sendButton.disabled = true;
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text }),
+        });
+        const data = await response.json();
+        addMessage('assistant', data.response || data.error || 'No response received.');
+      } catch (err) {
+        addMessage('assistant', 'Error contacting server.');
+      } finally {
+        sendButton.disabled = false;
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    prompt.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
